@@ -1,0 +1,24 @@
+version: '3'
+services:
+  flask-app:
+    image: 794669930797.dkr.ecr.us-east-1.amazonaws.com/flask-app-production:latest
+    links:
+      - redis
+    ports:
+      - 8000:8000
+    logging:
+      driver: awslogs
+      options: 
+        awslogs-group: tutorial-flask-app
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: flask-app
+  redis:
+    image: redis:3.2-alpine
+    ports:
+      - 6379:6379
+    logging:
+      driver: awslogs
+      options: 
+        awslogs-group: tutorial-redis
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: redis

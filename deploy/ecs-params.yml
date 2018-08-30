@@ -1,0 +1,9 @@
+version: 1
+task_definition:
+  services:
+    flask-app:
+      cpu_shares: 100
+      mem_limit: 524288000
+    redis:
+      cpu_shares: 100
+      mem_limit: 524288000
