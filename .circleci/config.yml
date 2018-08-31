@@ -1,6 +1,16 @@
 version: 2
 jobs:
   build:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Python test code
+          command: |
+            docker-compose up -d
+            docker exec flask-app python3 test.py
+
+  deploy-prod:
     docker:
       - image: docker:rc-git
     working_directory: /app
@@ -14,6 +24,8 @@ jobs:
             pip install \
               docker-compose \
               awscli
+            curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest
+            chmod +x /usr/local/bin/ecs-cli
       - run:
           name: Build application Docker image
           command: |
@@ -29,7 +41,17 @@ jobs:
       - deploy:
           name: Deploy Docker image
           command: |
-            curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest
-            chmod +x /usr/local/bin/ecs-cli
             ecs-cli configure --cluster flask-app-cluster --region ap-northeast-1 --default-launch-type EC2 --config-name flask-app-config
             ecs-cli compose --file deploy/docker-compose.yml up --create-log-groups --cluster-config flask-app-config
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy-prod:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master   
