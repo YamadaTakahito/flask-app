@@ -4,7 +4,7 @@ import main
 
 class TestPing(unittest.TestCase):
     def test_ping(self):
-        self.assertEqual(main.ping(), 'pong')
+        self.assertEqual(main.ping(), 'poong')
 
 if __name__ == '__main__':
     unittest.main()
