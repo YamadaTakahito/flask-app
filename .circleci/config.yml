@@ -13,7 +13,7 @@ jobs:
             apk add --no-cache py2-pip curl
             pip install \
               docker-compose= \
-              awscli==1.11.76
+              awscli
       - run:
           name: Build application Docker image
           command: |
