@@ -1,0 +1,35 @@
+version: 2
+jobs:
+  build:
+    working_directory: /app
+    docker:
+      - image: docker:rc-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --no-cache \
+              py-pip=9.0.0-r1
+            pip install \
+              docker-compose==1.12.0 \
+              awscli==1.11.76
+      - run:
+          name: Build application Docker image
+          command: |
+            docker build -t flask-app-development:latest  . 
+            docker build -t flask-app-production:latest -f deploy/Dockerfile .
+      - run:
+          name: Run tests
+          command: |
+            docker-compose -f ./docker-compose.test.yml up
+      - deploy:
+          name: Push application Docker image
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              login="$(aws ecr get-login)"
+              ${login}
+              docker tag app "${ECR_URL}/flask-app-production:${CIRCLE_SHA1}"
+              docker push "${ECR_URL}/flask-app-production:${CIRCLE_SHA1}"
+            fi
