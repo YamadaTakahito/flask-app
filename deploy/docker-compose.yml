@@ -10,7 +10,7 @@ services:
       driver: awslogs
       options: 
         awslogs-group: tutorial-flask-app
-        awslogs-region: us-east-1
+        awslogs-region: ap-northeast-1
         awslogs-stream-prefix: flask-app
   redis:
     image: redis:3.2-alpine
@@ -20,5 +20,5 @@ services:
       driver: awslogs
       options: 
         awslogs-group: tutorial-redis
-        awslogs-region: us-east-1
+        awslogs-region: ap-northeast-1
         awslogs-stream-prefix: redis
