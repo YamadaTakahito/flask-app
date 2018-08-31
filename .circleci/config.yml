@@ -10,10 +10,9 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --no-cache \
-              py2-pip-10.0.1-r0
+            apk add --no-cache py2-pip curl
             pip install \
-              docker-compose==1.12.0 \
+              docker-compose= \
               awscli==1.11.76
       - run:
           name: Build application Docker image
@@ -28,8 +27,17 @@ jobs:
           name: Push application Docker image
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              login="$(aws ecr get-login)"
+              login="$(aws ecr get-login  --no-include-email --region us-east-1)"
               ${login}
-              docker tag app "${ECR_URL}/flask-app-production:${CIRCLE_SHA1}"
-              docker push "${ECR_URL}/flask-app-production:${CIRCLE_SHA1}"
+              docker tag flask-app-production "${ECR_URL}:latest"
+              docker push "${ECR_URL}:latest"
+            fi
+      - deploy:
+          name: Deploy Docker image
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest
+              chmod +x /usr/local/bin/ecs-cli
+              ecs-cli configure --cluster flask-app-cluster --region ap-northeast-1 --default-launch-type EC2 --config-name flask-app-config
+              ecs-cli compose --file deploy/docker-compose.yml up --create-log-groups --cluster-config flask-app-config
             fi
