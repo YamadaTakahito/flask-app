@@ -3,8 +3,8 @@ jobs:
   build:
     docker:
       - image: docker:rc-git
-    steps:
     working_directory: /app
+    steps:
       - checkout
       - setup_remote_docker
       - run:
