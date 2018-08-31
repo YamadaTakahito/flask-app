@@ -18,6 +18,10 @@ jobs:
           command: |
             docker build -t flask-app-development:latest  . 
             docker build -t flask-app-production:latest -f deploy/Dockerfile .
+      - run:
+          name: Python test code
+          command: |
+            docker run flask-app-production python3 test.py
 
   deploy-prod:
     docker:
