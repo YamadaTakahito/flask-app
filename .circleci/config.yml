@@ -19,7 +19,7 @@ jobs:
           command: |
             docker build -t flask-app-development:latest  . 
             docker build -t flask-app-production:latest -f deploy/Dockerfile .
-      - deploy:
+      - run:
           name: Push application Docker image
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
